@@ -16,6 +16,7 @@ const prisma = new PrismaClient({ adapter });
 describe('Auth Middleware', ()=>{
     let app;
     before(()=>{
+        process.env.JWT_SECRET='votre_secret_jwt_de_32_caracteres_minimum';
         app = express ();
         app.get('/protected', authMiddleware, (req, res)=>{
             res.status(200).send('ok')
