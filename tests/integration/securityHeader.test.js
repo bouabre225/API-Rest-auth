@@ -4,16 +4,18 @@ import express from 'express';
 import request from 'supertest';
 import helmet from 'helmet';
 
-describe('Error handler', ()=>{
-    let app ;
-    before(()=>{
-    app = express();
-    app.get('/error', (req, res, next)=>{
-        const err = new Error('Test error');
-        err.status = 500;
-        next(err);
-    })
-    app.use(errorHandler)
+describe('Security Headers (CORS + Helmet)', () => {
+    let app;
+    before(() => {
+      app = express();
+      
+      app.get('/', (req, res) => res.send('OK'));
+    });
+
+    test('should have CORS headers', async () => {
+      const res = await request(app).get('/');
+
+      assert.ok(res.headers['access-control-allow-origin']);
     });
     
 })
