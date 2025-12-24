@@ -2,7 +2,8 @@ import { test, describe, before } from 'node:test';
 import assert from 'node:assert';
 import express from 'express';
 import request from 'supertest';
-import { validationResult } from 'express-validator';
+import {registerValidation} from "#middlewares/registerValidation.middleware";
+import {registerSchema} from "#dto/register.dto";
 
 
 describe('Register DTO validation', ()=>{
@@ -11,14 +12,8 @@ describe('Register DTO validation', ()=>{
         app = express();
         app.use(express.json());
 
-        app.post('/register', registerValidation, (res, req)=>{
-            const errors = validationResult(req);
-            if (!errors){
-                return res.status(422).json({
-                    errors: errors.array()
-                })
-            }res.sendStatus(200);
-        })
+        app.post('/register', registerValidation(registerSchema), (res, req)=>
+            res.sendStatus(200))
     })
 
     test('should reject invalid email', async ()=>{
