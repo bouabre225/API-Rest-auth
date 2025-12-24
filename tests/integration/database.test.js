@@ -40,6 +40,9 @@ describe('User model', () => {
     const user = await prisma.user.create({ data: { email: `jwt-${Date.now()}@example.com`, password: 'hashed', firstName: 'JWT', lastName: 'User' }})
     const token = jwt.sign({userId: user.id, email: user.email}, 'Secret-cle-avec-plus-de-mot', {expiresIn: '1h'})
     assert.ok(token, 'token must be generated')
-  });
 
+    //verified if jwt corrected generate
+    const decode = jwt.verify(token, 'Secret-cle-avec-plus-de-mot');
+    assert.strictEqual(user.id, decode.userId);
+  });
 });
