@@ -17,13 +17,13 @@ describe('Auth Middleware', ()=>{
     let app;
     before(()=>{
         app = express ();
-        app.get('/protected', authMiddleware, (req, res, next)=>{
-
-            if (!req.headers.authorization)return res.status(401).send('No Token');
+        app.get('/protected', authMiddleware, (req, res)=>{
+            res.status(200).send('ok')
         });
     });
+    
     test('should reject request without token', async ()=>{
-        const res = request(app).get('/protected');
+        const res = await request(app).get('/protected');
         assert.strictEqual(res.status, 401);
     })
 });
