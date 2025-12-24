@@ -12,7 +12,7 @@ describe('Register DTO validation', ()=>{
         app = express();
         app.use(express.json());
 
-        app.post('/register', registerValidation(registerSchema), (res, req)=>
+        app.post('/register', registerValidation(registerSchema), (req, res)=>
             res.sendStatus(200))
     })
 
@@ -23,6 +23,15 @@ describe('Register DTO validation', ()=>{
             firstName: 'Florent',
             lastName: 'BOUDZOUMOU'
         })
+        assert.strictEqual(res.status, 422);
+    })
+
+    test('should reject if password is short', async ()=>{
+        const res = await request(app).post('/register').send({
+            email: 'test',
+            firstName: 'Florent',
+            lastName: 'BOUDZOUMOU'
+        });
         assert.strictEqual(res.status, 422);
     })
 })
