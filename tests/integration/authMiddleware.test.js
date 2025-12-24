@@ -31,5 +31,9 @@ describe('Auth Middleware', ()=>{
         const res = await request(app).get('/protected').set('Authorization', 'Bear invalid token')
 
         assert.strictEqual(res.status, 401);
-    })
+    });
+
+    test('should reject malformed authorization header', async ()=>{
+        const res = await request(app).get('/protected').set('Authorization', 'InvalidFormat');
+    });
 });
