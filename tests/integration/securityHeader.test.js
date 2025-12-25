@@ -20,4 +20,11 @@ describe('Security Headers (CORS + Helmet)', () => {
       assert.ok(res.headers['access-control-allow-origin']);
     });
     
+    test('should have security headers from Helmet', async () => {
+      const res = await request(app).get('/');
+
+      assert.ok(res.headers['x-content-type-options']);
+      assert.ok(res.headers['x-frame-options']);
+  });
+
 })

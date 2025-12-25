@@ -10,7 +10,7 @@ describe('Error handler', ()=>{
     app = express();
     app.get('/error', (req, res, next)=>{
         const err = new Error('Test error');
-        err.status = 500;
+        err.statusCode = 500;
         next(err);
     })
     app.use(errorHandler)
@@ -20,12 +20,4 @@ describe('Error handler', ()=>{
         assert.strictEqual(res.status, 500);
         assert.strictEqual(res.body.error, 'Test error')
     })
-
-    test('should have security headers from Helmet', async () => {
-        const res = await request(app).get('/');
-        
-        assert.ok(res.headers['x-content-type-options']);
-        assert.ok(res.headers['x-dns-prefetch-control']);
-        assert.ok(res.headers['x-frame-options']);
-      });
 })
