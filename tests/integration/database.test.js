@@ -1,28 +1,27 @@
-import './env.js';
-import { test, describe, before, after } from 'node:test';
+import { describe, test, before, after } from 'node:test';
 import assert from 'node:assert';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
-import { PrismaClient } from '@prisma/client';
 import { setupDatabase } from './setup.js';
+import { prisma } from '#lib/prisma';
 import jwt from 'jsonwebtoken';
-const adapter = new PrismaBetterSqlite3({ url: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
-
-before(async () => {
-  setupDatabase();
-});
-
-after(async () => {
-  await prisma.$disconnect();
-});
 
 describe('User model', () => {
+  before(async () => {
+    setupDatabase();
+  });
+
+  after(async () => {
+    await prisma.$disconnect();
+  });
 
   test('should create and retrieve user', async () => {
     const email = `test-${Date.now()}@example.com`;
 
     const user = await prisma.user.create({
-      data: { email, password: 'hashed', firstName: 'Test', lastName: 'User',
+      data: { 
+        email, 
+        password: 'hashed', 
+        firstName: 'Test', 
+        lastName: 'User',
       },
     });
 
@@ -36,13 +35,26 @@ describe('User model', () => {
     assert.strictEqual(found.firstName, 'Test');
   });
 
-  test('should generate jwt', async ()=>{
-    const user = await prisma.user.create({ data: { email: `jwt-${Date.now()}@example.com`, password: 'hashed', firstName: 'JWT', lastName: 'User' }})
-    const token = jwt.sign({userId: user.id, email: user.email}, 'Secret-cle-avec-plus-de-mot', {expiresIn: '1h'})
-    assert.ok(token, 'token must be generated')
+  test('should generate jwt', async () => {
+    const user = await prisma.user.create({ 
+      data: { 
+        email: `jwt-${Date.now()}@example.com`, 
+        password: 'hashed', 
+        firstName: 'JWT', 
+        lastName: 'User' 
+      }
+    });
+    
+    const token = jwt.sign(
+      { userId: user.id, email: user.email }, 
+      'Secret-cle-avec-plus-de-mot', 
+      { expiresIn: '1h' }
+    );
+    
+    assert.ok(token);
 
-    //verified if jwt corrected generate
+    // Verify if jwt correctly generated
     const decode = jwt.verify(token, 'Secret-cle-avec-plus-de-mot');
-    assert.strictEqual(user.id, decode.userId);
+    assert.strictEqual(decode.userId, user.id);
   });
 });

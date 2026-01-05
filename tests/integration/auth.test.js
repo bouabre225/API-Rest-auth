@@ -1,20 +1,17 @@
-import './env.js';
-import { test, describe, before, after } from 'node:test';
-import assert from 'node:assert';
 import request from 'supertest';
 import { setupDatabase } from './setup.js';
 import app from '../../src/app.js';
 import { prisma } from '#lib/prisma';
 
 describe('Authentication Flow', () => {
-    before(async () => {
-        setupDatabase();
-        process.env.JWT_SECRET = 'votre_secret_jwt_de_32_caracteres_minimum';
-    });
+  beforeAll(async () => {
+    setupDatabase();
+    process.env.JWT_SECRET = 'votre_secret_jwt_de_32_caracteres_minimum';
+  });
 
-    after(async () => {
-        await prisma.$disconnect();
-    });
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
 
     test('should register a new user successfully', async () => {
         const res = await request(app)
