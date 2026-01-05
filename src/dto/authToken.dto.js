@@ -1,4 +1,4 @@
-export class authTokenDto{
+export class AuthTokenDto {
     constructor({userId, email}) {
         this.userId = userId;
         this.email = email;

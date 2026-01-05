@@ -1,13 +1,13 @@
-import jwt from "jsonwebtoken";
-import {authTokenDto} from "#dto/authToken.dto";
+import { verifyToken } from "#lib/jwt";
+import { AuthTokenDto } from "#dto/authToken.dto";
 
-export class authService{
-    static verifyAccessToken(token){
-        const payload = jwt.verify(token, process.env.JWT_SECRET);
+export class AuthService {
+    static async verifyAccessToken(token) {
+        const payload = await verifyToken(token);
 
-        return new authTokenDto({
+        return new AuthTokenDto({
             userId: payload.userId,
             email: payload.email
-        })
+        });
     }
 }
