@@ -1,4 +1,5 @@
 import argon2 from "argon2";
+import e from "express";
 
 export async function hashPassword(password) {
   return argon2.hash(password);
