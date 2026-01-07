@@ -20,7 +20,7 @@ describe('Register validation (integration)', () => {
   test('rejette un email invalide', async () => {
     const res = await request(app).post('/register').send({
       email: 'ric.com',
-      password: 'Password1',
+      password: 'Password',
     });
 
     expect(res.status).toBe(422);
@@ -38,7 +38,7 @@ describe('Register validation (integration)', () => {
   test('accepte un payload valide', async () => {
     const res = await request(app).post('/register').send({
       email: 'ric@mail.com',
-      password: 'Password1',
+      password: 'Password',
     });
 
     expect(res.status).toBe(200);
