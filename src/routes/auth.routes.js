@@ -9,5 +9,8 @@ router.post(
   "/verify-email",
   asyncHandler(AuthController.verifyEmailController)
 )
+router.post("/auth/forgot-password", asyncHandler(AuthController.forgotPassword));
+router.post("/auth/reset-password", asyncHandler(AuthController.resetPassword));
+
 
 export default router
