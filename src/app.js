@@ -1,31 +1,36 @@
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
 
-import { httpLogger } from "#lib/logger";
-import { errorHandler } from "#middlewares/error-handler";
-import { notFoundHandler } from "#middlewares/not-found";
-// Les routes seront importez ici
-
-// import userRoutes from "#routes/user.routes";
+const authRoutes = require('./routes/auth.routes');
 
 const app = express();
 
-// Middlewares
+// Middlewares globaux
 app.use(helmet());
 app.use(cors());
-app.use(httpLogger);
 app.use(express.json());
 
 // Routes
-app.get("/", (req, res) => {
-  res.json({ success: true, message: "API Express opérationnelle" });
+app.get('/', (req, res) => {
+  res.json({ success: true, message: 'API Express opérationnelle' });
 });
 
-// app.use("/api/users", userRoutes);
+app.use('/auth', authRoutes);
 
-// Handlers
-app.use(notFoundHandler);
-app.use(errorHandler);
+// Middleware NOT FOUND
+app.use((req, res, next) => {
+  res.status(404).json({
+    message: 'Route not found',
+  });
+});
 
-export default app; // CRITIQUE : On exporte l'objet sans le démarrer
+// Middleware GLOBAL d'erreur
+app.use((err, req, res, next) => {
+  res.status(err.statusCode || 500).json({
+    message: err.message || 'Internal Server Error',
+    details: err.details || null,
+  });
+});
+
+module.exports = app;
