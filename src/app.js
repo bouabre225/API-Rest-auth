@@ -6,6 +6,7 @@ import { httpLogger } from "#lib/logger";
 import { errorHandler } from "#middlewares/error-handler";
 import { notFoundHandler } from "#middlewares/not-found";
 // Les routes seront importez ici
+import authRouter from "#routes/auth.routes"
 
 // import userRoutes from "#routes/user.routes";
 
@@ -22,7 +23,7 @@ app.get("/", (req, res) => {
   res.json({ success: true, message: "API Express opérationnelle" });
 });
 
-// app.use("/api/users", userRoutes);
+app.use(authRouter);
 
 // Handlers
 app.use(notFoundHandler);
