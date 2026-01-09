@@ -1,5 +1,6 @@
 import prisma from "#lib/prisma"
 import { mailer } from "#lib/mailer"
+import { signToken, verifyToken} from "#lib/jwt"
 import { ConflictException, UnauthorizedException, BadRequestException } from "#lib/exceptions"
 
 // Ajoute des jours à une date
@@ -52,7 +53,7 @@ export class AuthService {
       throw new UnauthorizedException("Invalid refresh token")
     })
 
-    const accessToken = await signAccessToken({ userId: stored.userId })
+    const accessToken = await signToken({ userId: stored.userId })
     return { accessToken }
   }
 
