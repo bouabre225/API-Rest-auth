@@ -22,7 +22,7 @@ export const prisma = new Proxy({}, {
     if (!prismaInstance) {
       // Créer l'adapter avec la bonne syntaxe (config object, pas Database instance)
       const dbUrl = process.env.NODE_ENV === 'test' 
-        ? 'file::memory:'  // En test, utiliser :memory:
+        ? 'file:./test.db'  // Fichier partagé pour tous les tests
         : process.env.DATABASE_URL;
       
       const adapter = new PrismaBetterSqlite3({

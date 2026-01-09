@@ -179,7 +179,7 @@ describe('Login History Tracking', () => {
   test('should require authentication to view history', async () => {
     const res = await request(app).get('/api/users/me/login-history');
     
-    assert.strictEqual(res.status, 401, 'Should require authentication');
+    expect(res.status).toBe(401);
   });
 
   test('should order history by most recent first', async () => {
