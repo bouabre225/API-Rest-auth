@@ -41,8 +41,8 @@ describe('Login History Tracking', () => {
 
     expect(historyRes.status).toBe(200);
     expect(historyRes.body.success).toBeTruthy();
-    expect(Array.isArray(historyRes.body.data).toBeTruthy());
-    expect(historyRes.body.data.length > 0).toBeTruthy() // 'Should have login history';
+    expect(Array.isArray(historyRes.body.data)).toBe(true);
+    expect(historyRes.body.data.length > 0).toBeTruthy(); // 'Should have login history'
     
     const latestEntry = historyRes.body.data[0];
     expect(latestEntry.success).toBe(true);
@@ -83,18 +83,29 @@ describe('Login History Tracking', () => {
 
   test('should include IP address and user agent in history', async () => {
     const email = `history-metadata-${Date.now()}@example.com`;
+    const password = 'password123';
     
-    // Register and get token
-    const registerRes = await request(app)
+    // Register user
+    await request(app)
       .post('/api/users/register')
       .send({
         email,
-        password: 'password123',
+        password,
         firstName: 'Metadata',
         lastName: 'Test'
       });
 
-    const token = registerRes.body.data?.accessToken;
+    // Login to create login history entry
+    await request(app)
+      .post('/api/users/login')
+      .send({ email, password });
+
+    // Get new token after login
+    const loginRes = await request(app)
+      .post('/api/users/login')
+      .send({ email, password });
+
+    const token = loginRes.body.data?.accessToken;
 
     // Check history
     const historyRes = await request(app)
@@ -108,8 +119,8 @@ describe('Login History Tracking', () => {
     
     // Check that entries have metadata fields
     const entry = entries[0];
-    expect('ipAddress' in entry).toBeTruthy() // 'Should have ipAddress field';
-    expect('userAgent' in entry).toBeTruthy() // 'Should have userAgent field';
+    expect('ipAddress' in entry).toBeTruthy(); // 'Should have ipAddress field'
+    expect('userAgent' in entry).toBeTruthy(); // 'Should have userAgent field'
   });
 
   test('should limit history results based on query parameter', async () => {
