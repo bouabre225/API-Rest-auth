@@ -1,8 +1,10 @@
-import { z } from 'zod';
+const Joi = require('joi');
 
-export const registerSchema = z.object({
-  email: z.string().email('Email invalide'),
-  password: z.string().min(8, 'Le mot de passe doit faire au moins 8 caractères'),
-  firstName: z.string().min(2, 'Le prénom entier est requis'),
-  lastName: z.string().min(2, 'Le nom entier est requis'),
+const registerSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required(),
+  firstName: Joi.string().min(2).required(),
+  lastName: Joi.string().min(2).required(),
 });
+
+module.exports = { registerSchema };

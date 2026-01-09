@@ -1,3 +1,11 @@
+jest.mock('../../src/lib/prisma', () => ({
+  user: {
+    findUnique: jest.fn(),
+    create: jest.fn(),
+  },
+}));
+
+
 const request = require('supertest');
 const express = require('express');
 const prisma = require('../../src/lib/prisma');
