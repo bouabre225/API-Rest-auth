@@ -1,8 +1,17 @@
-import { describe, test, expect } from '@jest/globals';
+import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
 import request from 'supertest';
 import app from '../../src/app.js';
+import { setupDatabase } from './setup.js';
 
 describe('Rate Limiting - General Limiter', () => {
+  beforeAll(async () => {
+    await setupDatabase();
+  });
+
+  afterAll(async () => {
+    // Cleanup if needed
+  });
+
   test('should allow requests under the limit', async () => {
     const res = await request(app).get('/');
     expect(res.status).toBe(200);
@@ -20,9 +29,13 @@ describe('Rate Limiting - Authentication Limiter', () => {
     const res = await request(app)
       .post('/api/users/login')
       .send({
-        email: 'test@example.com',
+        email: `test-${Date.now()}@example.com`,
         password: 'wrongpassword'
       });
+    
+    if (![401, 400].includes(res.status)) {
+      console.log('Unexpected status:', res.status, 'Body:', res.body);
+    }
     
     expect([401, 400].includes(res.status)).toBe(true);
   });
