@@ -70,18 +70,9 @@ export class UserService {
             where: { email }
         });
 
-        // Log failed attempt if user not found
+        // If user not found, can't log in LoginHistory (foreign key constraint)
+        // Just throw error directly
         if (!user) {
-            // Log failed login attempt (no userId available)
-            await prisma.loginHistory.create({
-                data: {
-                    userId: 'unknown',
-                    ipAddress,
-                    userAgent,
-                    success: false
-                }
-            }).catch(() => {}); // Ignore errors in logging
-            
             throw new UnauthorizedException('Invalid credentials');
         }
 
@@ -97,7 +88,7 @@ export class UserService {
                     userAgent,
                     success: false
                 }
-            });
+            }).catch(() => {}); // Ignore errors in logging
             
             throw new UnauthorizedException('Invalid credentials');
         }
@@ -111,7 +102,7 @@ export class UserService {
                     userAgent,
                     success: false
                 }
-            });
+            }).catch(() => {}); // Ignore errors in logging
             
             throw new UnauthorizedException('Account is disabled');
         }
