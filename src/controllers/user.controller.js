@@ -115,4 +115,36 @@ export class UserController {
             }
         });
     });
+
+    /**
+     * Send verification email
+     * POST /api/users/verify-email
+     */
+    static sendVerificationEmail = asyncHandler(async (req, res) => {
+        const { VerificationService } = await import('#services/verification.service');
+        const token = await VerificationService.generateVerificationToken(req.user.id);
+        
+        // TODO: Send email with token (when mailer is integrated)
+        // For now, just return the token for testing
+        
+        res.status(200).json({
+            success: true,
+            message: 'Verification email sent',
+            data: { token } // Remove in production
+        });
+    });
+    
+    /**
+     * Verify email with token
+     * GET /api/users/verify/:token
+     */
+    static verifyEmail = asyncHandler(async (req, res) => {
+        const { VerificationService } = await import('#services/verification.service');
+        await VerificationService.verifyEmail(req.params.token);
+        
+        res.status(200).json({
+            success: true,
+            message: 'Email verified successfully'
+        });
+    });
 }

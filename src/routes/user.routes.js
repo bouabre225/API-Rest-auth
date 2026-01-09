@@ -9,10 +9,14 @@ const router = Router();
 router.post('/register', registerLimiter, UserController.register);
 router.post('/login', authLimiter, UserController.login);
 
+// Email verification routes
+router.get('/verify/:token', UserController.verifyEmail);
+
 // Protected routes (require authentication)
 router.get('/me', authMiddleware, UserController.getProfile);
 router.patch('/me', authMiddleware, UserController.updateProfile);
 router.post('/logout', authMiddleware, UserController.logout);
+router.post('/verify-email', authMiddleware, UserController.sendVerificationEmail);
 
 // Login history routes
 router.get('/me/login-history', authMiddleware, UserController.getLoginHistory);
