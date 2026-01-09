@@ -1,8 +1,12 @@
+import { PrismaClient } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import dotenv from 'dotenv';
 import path from 'path';
 
-// CRITICAL: Set DATABASE_URL BEFORE any other imports
+// Load environment variables
 dotenv.config();
+
+// Ensure DATABASE_URL is set (with fallback)
 if (!process.env.DATABASE_URL) {
   const dbPath = process.env.NODE_ENV === 'test' 
     ? path.resolve(process.cwd(), 'test.db')
@@ -10,24 +14,20 @@ if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = `file:${dbPath}`;
 }
 
-import { PrismaClient } from '@prisma/client';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
-import Database from 'better-sqlite3';
-
 let prismaInstance = null;
-let db = null;
-let adapter = null;
 
 // Lazy initialization - only create client when first accessed
 export const prisma = new Proxy({}, {
   get(target, prop) {
     if (!prismaInstance) {
-      // Create DB and adapter only when needed
-      if (!db) {
-        const dbPath = process.env.DATABASE_URL.replace('file:', '');
-        db = new Database(dbPath);
-        adapter = new PrismaBetterSqlite3(db);
-      }
+      // Créer l'adapter avec la bonne syntaxe (config object, pas Database instance)
+      const dbUrl = process.env.NODE_ENV === 'test' 
+        ? 'file::memory:'  // En test, utiliser :memory:
+        : process.env.DATABASE_URL;
+      
+      const adapter = new PrismaBetterSqlite3({
+        url: dbUrl
+      });
       
       // Initialize PrismaClient with adapter
       prismaInstance = new PrismaClient({ adapter });
