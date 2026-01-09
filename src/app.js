@@ -7,6 +7,10 @@ import { errorHandler } from "#middlewares/error-handler";
 import { notFoundHandler } from "#middlewares/not-found";
 import userRoutes from "#routes/user.routes";
 import adminRoutes from "#routes/admin.routes";
+// Les routes seront importez ici
+import authRouter from "#routes/auth.routes"
+
+// import userRoutes from "#routes/user.routes";
 
 const app = express();
 
@@ -23,6 +27,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use(authRouter);
 
 // Handlers
 app.use(notFoundHandler);
