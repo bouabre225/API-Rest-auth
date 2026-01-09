@@ -79,4 +79,80 @@ export class TokenService {
       user: refreshToken.user
     };
   }
+
+
+// OBTENIR TOUTES LES SESSIONS D'UN UTILISATEUR
+static async getUserSessions(userId) {
+  try {
+    const sessions = await prisma.refreshToken.findMany({
+      where: {
+        userId: userId,
+        revoked: false,
+        expiresAt: { gt: new Date() }  //pas expire
+      },
+      orderBy: { createdAt: "desc" }
+    });
+    
+    //formatage pour affichage
+    return sessions.map(session => ({
+      id: session.id,
+      token: session.token.substring(0, 10) + "...", //pas tout le token 
+      device: session.device,
+      userAgent: session.userAgent,
+      ipAddress: session.ipAddress,
+      createdAt: session.createdAt,
+      expiresAt: session.expiresAt,
+      isCurrent: false //on verra plus tard
+    }));
+    
+  } catch (error) {
+    console.error("Erreur récupération sessions:", error);
+    return [];
+  }
 }
+
+//revoquation (deconnection dun appareil)
+static async revokeToken(tokenId) {
+  try {
+    const updated = await prisma.refreshToken.update({
+      where: { id: tokenId },
+      data: { revoked: true }
+    });
+    
+    return { success: true, token: updated };
+    
+  } catch (error) {
+    console.error("Erreur révocation token:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+//revoquer tous les tokens dun user sauf un
+static async revokeAllUserTokens(userId, exceptTokenId = null) {
+  try {
+    const whereClause = { userId: userId };
+    
+    //si on veut en exclure un (ex: garder la session actuelle)
+    if (exceptTokenId) {
+      whereClause.id = { not: exceptTokenId };
+    }
+    
+    const result = await prisma.refreshToken.updateMany({
+      where: whereClause,
+      data: { revoked: true }
+    });
+    
+    return { 
+      success: true, 
+      count: result.count,
+      message: `${result.count} tokens révoqués`
+    };
+    
+  } catch (error) {
+    console.error("Erreur révocation multiple:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+}
+
