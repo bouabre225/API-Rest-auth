@@ -12,6 +12,7 @@ import userRoutes from "#routes/user.routes";
 import adminRoutes from "#routes/admin.routes";
 // Les routes seront importez ici
 import authRouter from "#routes/auth.routes"
+const twoFactorRoutes = require('./routes/twoFactorRoutes');
 
 // import userRoutes from "#routes/user.routes";
 
@@ -68,6 +69,7 @@ app.use("/auth", tokenRoutes); // ← IMPORTANT
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use(authRouter);
+app.use("/2fa", twoFactorRoutes);
 
 // 404 Handler
 app.use((req, res) => {
