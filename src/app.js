@@ -14,6 +14,7 @@ import adminRoutes from "#routes/admin.routes";
 import authRouter from "#routes/auth.routes"
 const twoFactorRoutes = require('./routes/twoFactorRoutes');
 const oauthRoutes = require('./routes/oauthRoutes');
+const userRoutes2 = require('./routes/userRoutes');
 const passport = require('./config/passport');
 
 // import userRoutes from "#routes/user.routes";
@@ -74,6 +75,7 @@ app.use("/api/admin", adminRoutes);
 app.use(authRouter);
 app.use("/2fa", twoFactorRoutes);
 app.use("/oauth", oauthRoutes);
+app.use("/user", userRoutes2);
 
 // 404 Handler
 app.use((req, res) => {
