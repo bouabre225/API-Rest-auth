@@ -1,15 +1,16 @@
-import { ValidationException } from "#lib/exceptions";
+const { ValidationException } = require('./exceptions');
 
-/**
- * Cette fonction vérifie que les données reçues respectent les règles prévues.
- * Si ce n'est pas le cas, elle lève une erreur (Exception) que le serveur catchera.
- */
-export function validateData(schema, data) {
-  const result = schema.safeParse(data);
+const validate = (schema) => (req, res, next) => {
+  const result = schema.safeParse(req.body);
 
   if (!result.success) {
-    throw new ValidationException(result.error.flatten().fieldErrors);
+    return res.status(422).json({
+      errors: result.error.errors,
+    });
   }
 
-  return result.data;
-}
+  req.validatedBody = result.data;
+  next();
+};
+
+module.exports = validate;

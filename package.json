@@ -2,7 +2,6 @@
   "name": "api-rest-auth",
   "version": "1.0.0",
   "description": "Implémenter une API REST d'authentification complète intégrant plusieurs méthodes d'authentification ( NodeJS + Express)",
-  "type": "module",
   "imports": {
     "#lib/*": "./src/lib/*.js",
     "#controllers/*": "./src/controllers/*.js",

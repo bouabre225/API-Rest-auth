@@ -21,7 +21,7 @@ const passport = require('./config/passport');
 
 const app = express();
 
-// Middlewares
+// Middlewares globaux
 app.use(helmet());
 app.use(cors());
 app.use(httpLogger);
