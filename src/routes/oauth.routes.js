@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const oauthController = require('../controllers/oauthController');
-const authMiddleware = require('../middlewares/authMiddleware');
+const authMiddleware = require('../middlewares/auth.middleware');
 
 router.get('/google', oauthController.googleAuth);
 router.get('/google/callback', oauthController.googleCallback);
