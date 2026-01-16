@@ -1,9 +1,9 @@
-const speakeasy = require('speakeasy');
-const QRCode = require('qrcode');
-const prisma = require('../config/database');
-const bcrypt = require('bcrypt');
+import speakeasy from 'speakeasy';
+import QRCode from 'qrcode';
+import {prisma} from '#lib/prisma';
+import bcrypt from 'bcrypt';
 
-class TwoFactorService {
+export class TwoFactorService {
   async enable2FA(userId) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
@@ -129,4 +129,3 @@ class TwoFactorService {
   }
 }
 
-module.exports = new TwoFactorService();
