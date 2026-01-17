@@ -1,16 +1,16 @@
-const passport = require('../config/passport');
-const jwt = require('jsonwebtoken');
-const oauthService = require('../services/oauthService');
+import {passportInstance} from '#config/passport';
+import jwt from 'jsonwebtoken';
+import {OAuthService} from '#services/oauth.service';
 
-class OAuthController {
+export class OAuthController {
   googleAuth(req, res, next) {
-    passport.authenticate('google', {
+    passportInstance.authenticate('google', {
       scope: ['profile', 'email']
     })(req, res, next);
   }
 
   async googleCallback(req, res, next) {
-    passport.authenticate('google', { session: false }, async (err, user) => {
+    passportInstance.authenticate('google', { session: false }, async (err, user) => {
       if (err || !user) {
         return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_failed`);
       }
@@ -36,7 +36,7 @@ class OAuthController {
       const userId = req.user.id;
       const { provider } = req.params;
 
-      await oauthService.unlinkAccount(userId, provider);
+      await OAuthService.unlinkAccount(userId, provider);
       res.json({ message: `Compte ${provider} détaché avec succès` });
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -46,7 +46,7 @@ class OAuthController {
   async getLinkedAccounts(req, res) {
     try {
       const userId = req.user.id;
-      const accounts = await oauthService.getLinkedAccounts(userId);
+      const accounts = await OAuthService.getLinkedAccounts(userId);
       res.json({ accounts });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -54,4 +54,3 @@ class OAuthController {
   }
 }
 
-module.exports = new OAuthController();
