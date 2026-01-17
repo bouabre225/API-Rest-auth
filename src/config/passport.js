@@ -1,8 +1,9 @@
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const prisma = require('./database');
+import passport from 'passport';
+import GoogleStrategy from 'passport-google-oauth20';
+import {prisma} from '#lib/prisma';
 
-passport.use(
+export const passportInstance = passport;
+passportInstance.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID || 'dummy-client-id',
@@ -58,11 +59,11 @@ passport.use(
   )
 );
 
-passport.serializeUser((user, done) => {
+passportInstance.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-passport.deserializeUser(async (id, done) => {
+passportInstance.deserializeUser(async (id, done) => {
   try {
     const user = await prisma.user.findUnique({ where: { id } });
     done(null, user);
@@ -71,4 +72,3 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-module.exports = passport;
