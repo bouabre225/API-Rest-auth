@@ -12,10 +12,10 @@ import userRoutes from "#routes/user.routes";
 import adminRoutes from "#routes/admin.routes";
 // Les routes seront importez ici
 import authRouter from "#routes/auth.routes"
-const twoFactorRoutes = require('./routes/twoFactorRoutes');
-const oauthRoutes = require('./routes/oauthRoutes');
-const userRoutes2 = require('./routes/userRoutes');
-const passport = require('./config/passport');
+import twoFactorRouter from "#routes/twoFactor.routes";
+import oauthRouter from "#routes/oauth.routes";
+import userRoutes2 from "#routes/userRoutes";
+//import {default as passport} from "#config/passport";
 
 // import userRoutes from "#routes/user.routes";
 
@@ -27,7 +27,7 @@ app.use(cors());
 app.use(httpLogger);
 app.use(generalLimiter);
 app.use(express.json());
-app.use(passport.initialize());
+//app.use(passport.initialize());
 
 // Route racine
 app.get("/", (req, res) => {
@@ -73,8 +73,8 @@ app.use("/auth", tokenRoutes); // ← IMPORTANT
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use(authRouter);
-app.use("/2fa", twoFactorRoutes);
-app.use("/oauth", oauthRoutes);
+app.use("/2fa", twoFactorRouter);
+app.use("/oauth", oauthRouter);
 app.use("/user", userRoutes2);
 
 // 404 Handler
