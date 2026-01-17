@@ -1,7 +1,7 @@
-const prisma = require('../config/database');
-const bcrypt = require('bcrypt');
+import { prisma } from '#lib/prisma';
+import bcrypt from 'bcrypt';
 
-class UserService {
+export class UserService {
   async getProfile(userId) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -144,4 +144,3 @@ class UserService {
   }
 }
 
-module.exports = new UserService();

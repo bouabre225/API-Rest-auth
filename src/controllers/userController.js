@@ -1,10 +1,10 @@
-const userService = require('../services/userService');
+import {UserService} from '#services/user.service';
 
-class UserController {
+export class UserController {
   async getProfile(req, res) {
     try {
       const userId = req.user.id;
-      const profile = await userService.getProfile(userId);
+      const profile = await UserService.getProfile(userId);
       res.json(profile);
     } catch (error) {
       res.status(404).json({ error: error.message });
@@ -16,7 +16,7 @@ class UserController {
       const userId = req.user.id;
       const { name, email } = req.body;
 
-      const updatedProfile = await userService.updateProfile(userId, { name, email });
+      const updatedProfile = await UserService.updateProfile(userId, { name, email });
       res.json({
         message: 'Profil mis à jour avec succès',
         user: updatedProfile
@@ -35,7 +35,7 @@ class UserController {
         return res.status(400).json({ error: 'Mot de passe requis' });
       }
 
-      await userService.deleteAccount(userId, password);
+      await UserService.deleteAccount(userId, password);
       res.json({ message: 'Compte désactivé avec succès' });
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -45,7 +45,7 @@ class UserController {
   async exportData(req, res) {
     try {
       const userId = req.user.id;
-      const data = await userService.exportData(userId);
+      const data = await UserService.exportData(userId);
       
       res.setHeader('Content-Type', 'application/json');
       res.setHeader('Content-Disposition', `attachment; filename="user-data-${userId}.json"`);
@@ -56,4 +56,3 @@ class UserController {
   }
 }
 
-module.exports = new UserController();
