@@ -24,9 +24,12 @@ describe('OAuth Tests', () => {
   });
 
   afterAll(async () => {
-    await prisma.oAuthAccount.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.$disconnect();
+    try {
+      await prisma.oAuthAccount.deleteMany();
+      await prisma.user.deleteMany();
+    } catch (error) {
+      // Ignore cleanup errors
+    }
   });
 
   describe('GET /oauth/google', () => {

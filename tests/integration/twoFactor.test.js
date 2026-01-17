@@ -25,9 +25,12 @@ describe('2FA Tests', () => {
   });
 
   afterAll(async () => {
-    await prisma.backupCode.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.$disconnect();
+    try {
+      await prisma.backupCode.deleteMany();
+      await prisma.user.deleteMany();
+    } catch (error) {
+      // Ignore cleanup errors
+    }
   });
 
   describe('POST /2fa/enable', () => {

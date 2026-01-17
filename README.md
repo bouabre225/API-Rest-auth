@@ -163,6 +163,206 @@ curl -X GET http://localhost:3000/api/users/me \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
+#### Modifier son profil
+```bash
+curl -X PATCH http://localhost:3000/api/users/me \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Jane",
+    "lastName": "Smith"
+  }'
+```
+
+#### Déconnexion
+```bash
+curl -X POST http://localhost:3000/api/users/logout \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### Demander vérification d'email
+```bash
+curl -X POST http://localhost:3000/api/users/verify-email \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### Vérifier l'email avec token
+```bash
+curl -X GET http://localhost:3000/api/users/verify/YOUR_VERIFICATION_TOKEN
+```
+
+#### Renvoyer l'email de vérification
+```bash
+curl -X POST http://localhost:3000/api/auth/resend-verification \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com"
+  }'
+```
+
+#### Mot de passe oublié
+```bash
+curl -X POST http://localhost:3000/api/auth/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com"
+  }'
+```
+
+#### Réinitialiser le mot de passe
+```bash
+curl -X POST http://localhost:3000/api/auth/reset-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "YOUR_RESET_TOKEN",
+    "newPassword": "NewSecurePass123!"
+  }'
+```
+
+#### Changer le mot de passe (authentifié)
+```bash
+curl -X PUT http://localhost:3000/api/password/password \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "oldPassword": "SecurePass123!",
+    "newPassword": "NewSecurePass456!"
+  }'
+```
+
+### 🔄 Gestion des tokens et sessions
+
+#### Rafraîchir l'access token
+```bash
+curl -X POST http://localhost:3000/api/tokens/refresh \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refreshToken": "YOUR_REFRESH_TOKEN"
+  }'
+```
+
+#### Lister les sessions actives
+```bash
+curl -X GET http://localhost:3000/api/tokens/sessions \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### Révoquer une session spécifique
+```bash
+curl -X DELETE http://localhost:3000/api/tokens/sessions/SESSION_ID \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### Révoquer toutes les autres sessions
+```bash
+curl -X DELETE http://localhost:3000/api/tokens/sessions/others \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### 🔐 Authentification à deux facteurs (2FA)
+
+#### Activer le 2FA (génère QR code)
+```bash
+curl -X POST http://localhost:3000/api/2fa/enable \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### Confirmer l'activation du 2FA
+```bash
+curl -X POST http://localhost:3000/api/2fa/confirm \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "123456"
+  }'
+```
+
+#### Vérifier le code 2FA au login
+```bash
+curl -X POST http://localhost:3000/api/2fa/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "USER_ID",
+    "token": "123456"
+  }'
+```
+
+#### Désactiver le 2FA
+```bash
+curl -X POST http://localhost:3000/api/2fa/disable \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "password": "SecurePass123!"
+  }'
+```
+
+### 🌐 OAuth (Google)
+
+#### Initier connexion Google
+```bash
+# Ouvrir dans le navigateur
+http://localhost:3000/api/oauth/google
+```
+
+#### Récupérer les comptes OAuth liés
+```bash
+curl -X GET http://localhost:3000/api/oauth/linked \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### Délier un compte OAuth
+```bash
+curl -X DELETE http://localhost:3000/api/oauth/unlink/google \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### 👤 Gestion du profil utilisateur
+
+#### Supprimer son compte (soft delete)
+```bash
+curl -X DELETE http://localhost:3000/api/user/profile/account \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### Exporter ses données (RGPD)
+```bash
+curl -X GET http://localhost:3000/api/user/profile/export \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### Historique de connexions
+```bash
+curl -X GET http://localhost:3000/api/users/me/login-history \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+#### Tentatives de connexion échouées
+```bash
+curl -X GET http://localhost:3000/api/users/me/failed-attempts \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### 🔧 Administration (endpoints admin)
+
+#### Statistiques de la blacklist
+```bash
+curl -X GET http://localhost:3000/api/admin/blacklist/stats \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+```
+
+#### Déclencher le nettoyage manuel
+```bash
+curl -X POST http://localhost:3000/api/admin/cleanup \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+```
+
+#### Révoquer tous les tokens d'un utilisateur
+```bash
+curl -X POST http://localhost:3000/api/admin/users/USER_ID/revoke-tokens \
+  -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+```
+
 **💡 Conseil:** Pour une exploration complète des endpoints avec exemples interactifs, utilisez l'interface web à `/api-docs`
 
 ## 🔒 Sécurité
