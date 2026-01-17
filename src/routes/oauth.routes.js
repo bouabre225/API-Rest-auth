@@ -1,11 +1,13 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const oauthController = require('../controllers/oauthController');
-const authMiddleware = require('../middlewares/auth.middleware');
+import {OAuthController} from '#controllers/oauthController';
+import {authMiddleware} from '#middlewares/auth.middleware';
+
+const oauthController = new OAuthController();
 
 router.get('/google', oauthController.googleAuth);
 router.get('/google/callback', oauthController.googleCallback);
 router.delete('/unlink/:provider', authMiddleware, oauthController.unlinkProvider);
 router.get('/linked', authMiddleware, oauthController.getLinkedAccounts);
 
-module.exports = router;
+export default router;

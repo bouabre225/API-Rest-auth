@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { TokenService } from "#services/token.service";
 import { asyncHandler } from "#lib/async-handler";
-import { authenticate } from "#middlewares/auth.middleware";
+import { authMiddleware } from "#middlewares/auth.middleware";
 
 const router = Router();
 
@@ -47,7 +47,7 @@ router.post("/refresh", asyncHandler(async (req, res) => {
  * @desc    Lister toutes les sessions actives de l'utilisateur
  * @access  Private (authentifié)
  */
-router.get("/sessions", authenticate, asyncHandler(async (req, res) => {
+router.get("/sessions", authMiddleware, asyncHandler(async (req, res) => {
   const sessions = await TokenService.getUserSessions(req.user.id);
   
   res.json({
@@ -62,7 +62,7 @@ router.get("/sessions", authenticate, asyncHandler(async (req, res) => {
  * @desc    Révoquer une session spécifique
  * @access  Private (authentifié)
  */
-router.delete("/sessions/:id", authenticate, asyncHandler(async (req, res) => {
+router.delete("/sessions/:id", authMiddleware, asyncHandler(async (req, res) => {
   const { id } = req.params;
   
   const result = await TokenService.revokeToken(id);
@@ -85,7 +85,7 @@ router.delete("/sessions/:id", authenticate, asyncHandler(async (req, res) => {
  * @desc    Révoquer toutes les autres sessions (garder la courante)
  * @access  Private (authentifié)
  */
-router.delete("/sessions/others", authenticate, asyncHandler(async (req, res) => {
+router.delete("/sessions/others", authMiddleware, asyncHandler(async (req, res) => {
   const currentTokenId = req.currentRefreshTokenId; // À définir par le middleware
   
   const result = await TokenService.revokeAllUserTokens(req.user.id, currentTokenId);
