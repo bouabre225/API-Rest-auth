@@ -1,16 +1,18 @@
-const passport = require('../config/passport');
-const jwt = require('jsonwebtoken');
-const oauthService = require('../services/oauthService');
+import {passportInstance} from '../config/passport.js';
+import jwt from 'jsonwebtoken';
+import {OAuthService} from '../services/oauthService.js';
+
+const oauthService = new OAuthService();
 
 class OAuthController {
   googleAuth(req, res, next) {
-    passport.authenticate('google', {
+    passportInstance.authenticate('google', {
       scope: ['profile', 'email']
     })(req, res, next);
   }
 
   async googleCallback(req, res, next) {
-    passport.authenticate('google', { session: false }, async (err, user) => {
+    passportInstance.authenticate('google', { session: false }, async (err, user) => {
       if (err || !user) {
         return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_failed`);
       }
@@ -54,4 +56,8 @@ class OAuthController {
   }
 }
 
-module.exports = new OAuthController();
+const controller = new OAuthController();
+export const googleAuth = controller.googleAuth.bind(controller);
+export const googleCallback = controller.googleCallback.bind(controller);
+export const unlinkProvider = controller.unlinkProvider.bind(controller);
+export const getLinkedAccounts = controller.getLinkedAccounts.bind(controller);

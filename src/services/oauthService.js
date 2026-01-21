@@ -1,6 +1,6 @@
-const prisma = require('../config/database');
+import {prisma} from '#lib/prisma';
 
-class OAuthService {
+export class OAuthService {
   async linkAccount(userId, provider, providerAccountId, accessToken, refreshToken) {
     const existingAccount = await prisma.oAuthAccount.findFirst({
       where: {
@@ -65,5 +65,3 @@ class OAuthService {
     });
   }
 }
-
-module.exports = new OAuthService();

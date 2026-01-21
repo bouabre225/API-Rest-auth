@@ -93,7 +93,7 @@ app.use("/api/auth", tokenRoutes);
 app.use("/api/auth", passwordRoutes);
 app.use("/api/auth", authRouter);
 app.use("/api/auth", twoFactorRoutes);
-app.use("/api/auth", oauthRoutes);
+app.use("/api/oauth", oauthRoutes);
 app.use("/api/user", userRoutes2);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
