@@ -76,7 +76,7 @@ app.get("/test-token", async (req, res) => {
         device: token.device,
         expiresAt: token.expiresAt.toISOString()
       },
-      message: "✅ Service token fonctionne !"
+      message: "Service token fonctionne !"
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

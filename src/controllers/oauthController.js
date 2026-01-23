@@ -1,22 +1,81 @@
-import {passportInstance} from '../config/passport.js';
 import jwt from 'jsonwebtoken';
 import {OAuthService} from '../services/oauthService.js';
+import {googleOAuthConfig} from '../config/oauth.config.js';
+import {prisma} from '#lib/prisma';
 
 const oauthService = new OAuthService();
 
 class OAuthController {
+  // Rediriger vers Google pour l'authentification
   googleAuth(req, res, next) {
-    passportInstance.authenticate('google', {
-      scope: ['profile', 'email']
-    })(req, res, next);
+    try {
+      const authUrl = googleOAuthConfig.getAuthorizationUrl();
+      res.redirect(authUrl);
+    } catch (error) {
+      res.status(500).json({ error: 'Erreur lors de la génération de l\'URL OAuth' });
+    }
   }
 
+  // Callback après authentification Google
   async googleCallback(req, res, next) {
-    passportInstance.authenticate('google', { session: false }, async (err, user) => {
-      if (err || !user) {
-        return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_failed`);
+    try {
+      const { code } = req.query;
+
+      if (!code) {
+        return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=no_code`);
       }
 
+      // Échanger le code contre des tokens
+      const tokens = await oauthService.exchangeCodeForTokens(code);
+      
+      // Récupérer les infos utilisateur
+      const googleUser = await oauthService.getUserInfo(tokens.access_token);
+
+      // Trouver ou créer l'utilisateur
+      let user = await prisma.user.findUnique({ 
+        where: { email: googleUser.email } 
+      });
+
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            email: googleUser.email,
+            name: googleUser.name,
+            emailVerified: true,
+            emailVerifiedAt: new Date()
+          }
+        });
+      }
+
+      // Créer ou mettre à jour le compte OAuth
+      let oauthAccount = await prisma.oAuthAccount.findFirst({
+        where: {
+          provider: 'google',
+          providerAccountId: googleUser.id
+        }
+      });
+
+      if (!oauthAccount) {
+        oauthAccount = await prisma.oAuthAccount.create({
+          data: {
+            userId: user.id,
+            provider: 'google',
+            providerAccountId: googleUser.id,
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token
+          }
+        });
+      } else {
+        await prisma.oAuthAccount.update({
+          where: { id: oauthAccount.id },
+          data: { 
+            accessToken: tokens.access_token, 
+            refreshToken: tokens.refresh_token 
+          }
+        });
+      }
+
+      // Générer les JWT tokens pour notre app
       const accessToken = jwt.sign(
         { userId: user.id },
         process.env.JWT_SECRET,
@@ -30,7 +89,10 @@ class OAuthController {
       );
 
       res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/callback?token=${accessToken}&refresh=${refreshToken}`);
-    })(req, res, next);
+    } catch (error) {
+      console.error('OAuth callback error:', error);
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_failed`);
+    }
   }
 
   async unlinkProvider(req, res) {

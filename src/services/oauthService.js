@@ -1,6 +1,40 @@
 import {prisma} from '#lib/prisma';
+import axios from 'axios';
+import {googleOAuthConfig} from '../config/oauth.config.js';
 
 export class OAuthService {
+  // Échanger le code d'autorisation contre des tokens
+  async exchangeCodeForTokens(code) {
+    try {
+      const response = await axios.post(googleOAuthConfig.tokenUrl, {
+        code,
+        client_id: googleOAuthConfig.clientId,
+        client_secret: googleOAuthConfig.clientSecret,
+        redirect_uri: googleOAuthConfig.redirectUri,
+        grant_type: 'authorization_code'
+      });
+
+      return response.data;
+    } catch (error) {
+      throw new Error('Échec de l\'échange du code OAuth: ' + error.message);
+    }
+  }
+
+  // Récupérer les informations utilisateur depuis Google
+  async getUserInfo(accessToken) {
+    try {
+      const response = await axios.get(googleOAuthConfig.userInfoUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+
+      return response.data;
+    } catch (error) {
+      throw new Error('Échec de récupération des infos utilisateur: ' + error.message);
+    }
+  }
+
   async linkAccount(userId, provider, providerAccountId, accessToken, refreshToken) {
     const existingAccount = await prisma.oAuthAccount.findFirst({
       where: {
