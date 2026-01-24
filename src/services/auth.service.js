@@ -28,14 +28,41 @@ export class AuthService {
       throw new BadRequestException("Token expired")
     }
 
+    let user;
     await prisma.$transaction(async (tx) => {
-      await tx.user.update({
+      user = await tx.user.update({
         where: { id: record.userId },
         data: { emailVerifiedAt: new Date() },
       })
 
       await tx.verificationToken.delete({ where: { token } });
     })
+
+    // Generate access token
+    const accessToken = await signToken({
+        userId: user.id,
+        email: user.email
+    }, '1h');
+
+    // Generate refresh token
+    const refreshToken = await signToken({
+        userId: user.id,
+        email: user.email
+    }, '7d');
+
+    // Store refresh token
+    await prisma.refreshToken.create({
+        data: {
+            token: refreshToken,
+            userId: user.id,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
+    });
+
+    return {
+        accessToken,
+        refreshToken
+    };
   }
 
   // Rafraîchit un token d'accès à partir d'un token de rafraîchissement avec rotation

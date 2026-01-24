@@ -7,10 +7,11 @@ export class AuthController {
     static async verifyEmailController(req, res) {
       const {token} = req.query
 
-      await AuthService.verifyEmail(token)
+      const tokens = await AuthService.verifyEmail(token)
       res.json({
         success: true,
         message: "Email verified successfully",
+        data: tokens
       })
     }
 
@@ -18,10 +19,11 @@ export class AuthController {
     static async verifyEmailByToken(req, res) {
       const {token} = req.params
 
-      await AuthService.verifyEmail(token)
+      const tokens = await AuthService.verifyEmail(token)
       res.json({
         success: true,
         message: "Email verified successfully",
+        data: tokens
       })
     }
 

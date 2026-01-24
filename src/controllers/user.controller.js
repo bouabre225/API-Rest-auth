@@ -139,12 +139,13 @@ export class UserController {
      * GET /api/users/verify/:token
      */
     static verifyEmail = asyncHandler(async (req, res) => {
-        const { VerificationService } = await import('#services/verification.service');
-        await VerificationService.verifyEmail(req.params.token);
+        const { AuthService } = await import('#services/auth.service');
+        const tokens = await AuthService.verifyEmail(req.params.token);
         
         res.status(200).json({
             success: true,
-            message: 'Email verified successfully'
+            message: 'Email verified successfully',
+            data: tokens
         });
     });
 }
